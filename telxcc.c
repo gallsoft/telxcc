@@ -540,6 +540,7 @@ void process_page(teletext_page_t *page) {
 	fflush(fout);
 }
 
+
 void process_telx_packet(data_unit_t data_unit_id, teletext_packet_payload_t *packet, uint64_t timestamp) {
 	// variable names conform to ETS 300 706, chapter 7.1.2
 	uint8_t address = (unham_8_4(packet->address[1]) << 4) | unham_8_4(packet->address[0]);
@@ -547,6 +548,22 @@ void process_telx_packet(data_unit_t data_unit_id, teletext_packet_payload_t *pa
 	if (m == 0) m = 8;
 	uint8_t y = (address >> 3) & 0x1f;
 	uint8_t designation_code = (y > 25) ? unham_8_4(packet->data[0]) : 0x00;
+{
+#if 0
+    const unsigned char h[] = {0xAA, 0xAA, 0xE4};
+    FILE* f = fopen("raw42", "ab");
+    fwrite(h, 1, 3, f);
+    fwrite(((unsigned char*)packet) + 2, 1, 42, f);
+    fclose(f);
+#endif
+
+#if 1
+fprintf(stderr, "// %d\n", (int)sizeof(teletext_packet_payload_t));
+for(int q = 0; q < sizeof(teletext_packet_payload_t); q++)
+fprintf(stderr, "0x%.2X,", ((unsigned char*)packet)[q]);
+fprintf(stderr, "\n");
+#endif
+}
 
 	if (y == 0) {
 		// CC map
